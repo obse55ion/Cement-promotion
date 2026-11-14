@@ -17,4 +17,8 @@ public class Price {
         int discount = discountPolicy.getCurrentDiscount();
         return price * (100 - discount) / 100;
     }
+
+    public void onOrderProcess() {
+        discountPolicy.next();
+    }
 }

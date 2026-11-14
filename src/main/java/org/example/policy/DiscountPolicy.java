@@ -7,10 +7,11 @@ public class DiscountPolicy {
     private final int midDiscount;
     private int currentDiscount;
 
-    public DiscountPolicy(int startDiscount, int stepDiscount, int midDiscount) {
+    public DiscountPolicy(int startDiscount, int stepDiscount, int midDiscount, int currentDiscount) {
         this.startDiscount = startDiscount;
         this.stepDiscount = stepDiscount;
         this.midDiscount = midDiscount;
+        this.currentDiscount = currentDiscount;
     }
 
     public int getCurrentDiscount() {
@@ -18,6 +19,6 @@ public class DiscountPolicy {
     }
 
     public void next() {
-        currentDiscount = Math.max(midDiscount, startDiscount - stepDiscount);
+        currentDiscount = Math.max(midDiscount, currentDiscount - stepDiscount);
     }
 }
