@@ -5,14 +5,14 @@ import java.time.LocalDateTime;
 public class Order {
 
     private LocalDateTime orderTime;
-    private int price;
+    private int quantity;
     private String customerName;
 
     public Order(LocalDateTime orderTime,
                  int price,
                  String customerName) {
         setOrderTime(orderTime);
-        setPrice(price);
+        setQuantity(price);
         setCustomerName(customerName);
     }
 
@@ -20,8 +20,8 @@ public class Order {
         return orderTime;
     }
 
-    public int getPrice() {
-        return price;
+    public int getQuantity() {
+        return quantity;
     }
 
     public String getCustomerName() {
@@ -35,7 +35,6 @@ public class Order {
         this.orderTime = orderTime;
     }
 
-
     public void setCustomerName(String customerName) {
         if (customerName == null) {
             throw new IllegalArgumentException("Заказчик не может быть null");
@@ -43,11 +42,11 @@ public class Order {
         this.customerName = customerName;
     }
 
-    public void setPrice(int price) {
-        if (price <= 0) {
+    public void setQuantity(int quantity) {
+        if (quantity <= 0) {
             throw new IllegalArgumentException("Цена не может быть пустой");
         }
-        this.price = price;
+        this.quantity = quantity;
     }
 
 }
