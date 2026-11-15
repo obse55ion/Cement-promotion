@@ -1,6 +1,5 @@
 package org.example.adapter.interfaces;
 
-import org.example.adapter.FileOrderAdapter;
 import org.example.entity.Order;
 
 import java.io.IOException;

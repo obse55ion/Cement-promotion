@@ -40,7 +40,6 @@ public class SaleService {
         for (Map.Entry<String, Integer> entry : companyTotals.entrySet()) {
             String companyName = entry.getKey();
             Integer totalPrice = entry.getValue();
-            System.out.println(companyName + " - " + totalPrice);
         }
 
         return companyTotals;
