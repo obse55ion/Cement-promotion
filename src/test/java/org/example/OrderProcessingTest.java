@@ -2,6 +2,8 @@
 package org.example;
 
 import org.example.adapter.AbstractFileOrderAdapter;
+import org.example.adapter.HashFileOrderAdapter;
+import org.example.adapter.PipeFileOrderAdapter;
 import org.example.entity.Order;
 import org.example.service.SaleService;
 import org.junit.jupiter.api.Test;
@@ -21,10 +23,10 @@ class OrderProcessingTest {
 
         // Создаём адаптеры
         AbstractFileOrderAdapter txtAdapter =
-                new AbstractFileOrderAdapter("\\|");
+                new PipeFileOrderAdapter();
 
         AbstractFileOrderAdapter hashAdapter =
-                new AbstractFileOrderAdapter("#");
+                new HashFileOrderAdapter();
 
         // Читаем заказы
         List<Order> allOrders = new ArrayList<>();
