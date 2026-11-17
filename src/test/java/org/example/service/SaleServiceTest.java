@@ -1,7 +1,7 @@
 
 package org.example.service;
 
-import org.example.adapter.FileOrderAdapter;
+import org.example.adapter.AbstractFileOrderAdapter;
 import org.example.entity.Order;
 import org.junit.jupiter.api.Test;
 
@@ -18,11 +18,11 @@ class SaleServiceTest {
     void correctlyCalculatesPricesForRealOrders()
             throws Exception {
 
-        FileOrderAdapter txtAdapter =
-                new FileOrderAdapter("\\|");
+        AbstractFileOrderAdapter txtAdapter =
+                new AbstractFileOrderAdapter("\\|");
 
-        FileOrderAdapter hashAdapter =
-                new FileOrderAdapter("#");
+        AbstractFileOrderAdapter hashAdapter =
+                new AbstractFileOrderAdapter("#");
 
         List<Order> orders = new ArrayList<>();
 

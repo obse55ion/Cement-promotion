@@ -1,7 +1,7 @@
 
 package org.example;
 
-import org.example.adapter.FileOrderAdapter;
+import org.example.adapter.AbstractFileOrderAdapter;
 import org.example.entity.Order;
 import org.example.service.SaleService;
 import org.junit.jupiter.api.Test;
@@ -20,11 +20,11 @@ class OrderProcessingTest {
             throws Exception {
 
         // Создаём адаптеры
-        FileOrderAdapter txtAdapter =
-                new FileOrderAdapter("\\|");
+        AbstractFileOrderAdapter txtAdapter =
+                new AbstractFileOrderAdapter("\\|");
 
-        FileOrderAdapter hashAdapter =
-                new FileOrderAdapter("#");
+        AbstractFileOrderAdapter hashAdapter =
+                new AbstractFileOrderAdapter("#");
 
         // Читаем заказы
         List<Order> allOrders = new ArrayList<>();

@@ -1,6 +1,8 @@
 package org.example;
 
-import org.example.adapter.FileOrderAdapter;
+import org.example.adapter.AbstractFileOrderAdapter;
+import org.example.adapter.HashFileOrderAdapter;
+import org.example.adapter.PipeFileOrderAdapter;
 import org.example.adapter.interfaces.OrderSource;
 import org.example.entity.Order;
 import org.example.repository.ResultWriter;
@@ -14,8 +16,8 @@ import java.util.Map;
 
 public class Main {
     static void main() throws IOException {
-        OrderSource txtReader = new FileOrderAdapter("\\|");
-        OrderSource hashReader = new FileOrderAdapter("#");
+        OrderSource txtReader = new PipeFileOrderAdapter();
+        OrderSource hashReader = new HashFileOrderAdapter();
 
         List<Order> txtOrders = txtReader.readOrders("discount_day.txt");
         List<Order> hashOrders = hashReader.readOrders("discount_day_without_ext");

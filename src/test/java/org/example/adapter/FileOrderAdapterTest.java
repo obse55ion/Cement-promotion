@@ -4,6 +4,7 @@ package org.example.adapter;
 import org.example.entity.Order;
 import org.junit.jupiter.api.Test;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,75 +13,69 @@ class FileOrderAdapterTest {
 
     @Test
     void readsOrdersFromTxtFile() throws Exception {
-        FileOrderAdapter adapter =
-                new FileOrderAdapter("\\|");
+        PipeFileOrderAdapter adapter =
+                new PipeFileOrderAdapter();
 
         List<Order> orders =
                 adapter.readOrders("discount_day.txt");
 
         assertEquals(13, orders.size());
 
-        assertEquals(
-                "Industrial",
-                orders.get(0).getCustomerName()
-        );
+        assertEquals("Industrial",
+                orders.getFirst().getCustomerName());
 
-        assertEquals(
-                8800,
-                orders.get(0).getQuantity()
-        );
+        assertEquals(8800,
+                orders.getFirst().getQuantity());
     }
 
     @Test
     void readsOrdersFromFileWithoutExtension()
             throws Exception {
 
-        FileOrderAdapter adapter =
-                new FileOrderAdapter("#");
+        HashFileOrderAdapter adapter =
+                new HashFileOrderAdapter();
 
         List<Order> orders =
                 adapter.readOrders("discount_day_without_ext");
 
         assertEquals(13, orders.size());
 
-        assertEquals(
-                "Industrial",
-                orders.get(0).getCustomerName()
-        );
+        assertEquals("Industrial",
+                orders.getFirst().getCustomerName());
 
-        assertEquals(
-                8800,
-                orders.get(0).getQuantity()
-        );
+        assertEquals(8800,
+                orders.getFirst().getQuantity());
     }
 
     @Test
-    void bothFilesContainSameNumberOfOrders()
+    void bothAdaptersReadSameNumberOfOrders()
             throws Exception {
 
-        FileOrderAdapter txtAdapter =
-                new FileOrderAdapter("\\|");
+        PipeFileOrderAdapter pipeAdapter =
+                new PipeFileOrderAdapter();
 
-        FileOrderAdapter hashAdapter =
-                new FileOrderAdapter("#");
+        HashFileOrderAdapter hashAdapter =
+                new HashFileOrderAdapter();
 
-        List<Order> txtOrders =
-                txtAdapter.readOrders("discount_day.txt");
+        List<Order> pipeOrders =
+                pipeAdapter.readOrders("discount_day.txt");
 
         List<Order> hashOrders =
                 hashAdapter.readOrders("discount_day_without_ext");
 
-        assertEquals(txtOrders.size(), hashOrders.size());
+        assertEquals(13, pipeOrders.size());
+        assertEquals(13, hashOrders.size());
+        assertEquals(pipeOrders.size(), hashOrders.size());
     }
 
     @Test
     void throwsExceptionWhenFileDoesNotExist() {
 
-        FileOrderAdapter adapter =
-                new FileOrderAdapter("\\|");
+        PipeFileOrderAdapter adapter =
+                new PipeFileOrderAdapter();
 
         assertThrows(
-                java.io.FileNotFoundException.class,
+                FileNotFoundException.class,
                 () -> adapter.readOrders("missing.txt")
         );
     }
