@@ -16,6 +16,23 @@ public class SaleService {
     private final BigDecimal discountStep;
 
     public SaleService(BigDecimal price, BigDecimal startDiscount, BigDecimal discountStep) {
+        if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException();
+        }
+        if (startDiscount == null
+                || startDiscount.compareTo(BigDecimal.ZERO) < 0
+                || startDiscount.compareTo(BigDecimal.ONE) > 0) {
+            throw new IllegalArgumentException();
+        }
+        if (discountStep == null
+                || discountStep.compareTo(BigDecimal.ZERO) <= 0
+                || discountStep.compareTo(BigDecimal.ONE) > 0) {
+            throw new IllegalArgumentException();
+        }
+        if (startDiscount.add(discountStep).compareTo(BigDecimal.ONE) > 0) {
+            throw new IllegalArgumentException();
+        }
+
         this.price = price;
         this.startDiscount = startDiscount;
         this.discountStep = discountStep;
