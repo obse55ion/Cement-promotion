@@ -4,68 +4,78 @@ import org.example.adapter.interfaces.OrderSource;
 import org.example.entity.Order;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Pattern;
 
-abstract public class AbstractFileOrderAdapter implements OrderSource {
+public abstract class AbstractFileOrderAdapter implements OrderSource {
 
     private final String separator;
 
     public AbstractFileOrderAdapter(String separator) {
-        this.separator = separator;
+        this.separator = Objects.requireNonNull(
+                separator, "Разделитель не может быть null"
+        );
+
+        if (separator.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Разделитель не может быть пустым"
+            );
+        }
     }
 
     @Override
-    public List<Order> readOrders(String filePath) throws IOException {
-        List<String> lines = loadLines(filePath);
+    public List<Order> readOrders(Path filePath) throws IOException {
+        Objects.requireNonNull(filePath, "Путь к файлу не может быть null");
         List<Order> orders = new ArrayList<>();
-        for (String line : lines) {
-            if (line.isBlank()) {
-                continue;
-            }
-            String[] parts = line.split(separator);
-            if (parts.length != 3) {
-                throw new IllegalArgumentException(
-                        "Некорректная строка: " + line);
-            }
-            LocalDateTime orderTime = LocalDateTime.parse(parts[0]);
-            String customerName = parts[1];
-            int quantity = Integer.parseInt(parts[2]);
 
-            Order order = new Order(
-                    orderTime,
-                    quantity,
-                    customerName);
-            orders.add(order);
+        try (BufferedReader reader = Files.newBufferedReader(
+                filePath, StandardCharsets.UTF_8)) {
+
+            String line;
+            int lineNumber = 0;
+
+            while ((line = reader.readLine()) != null) {
+                lineNumber++;
+
+                if (line.isBlank()) {
+                    continue;
+                }
+
+                orders.add(parseOrder(line, lineNumber));
+            }
         }
+
         return orders;
     }
 
-    private List<String> loadLines(String resourceName) throws IOException {
+    private Order parseOrder(String line, int lineNumber) {
+        String[] parts = line.split(Pattern.quote(separator), -1);
 
-        InputStream inputStream = getClass()
-                .getClassLoader()
-                .getResourceAsStream(resourceName);
-
-        if (inputStream == null) {
-            throw new FileNotFoundException(
-                    "Файл не найден: " + resourceName);
+        if (parts.length != 3) {
+            throw new IllegalArgumentException(
+                    "Некорректная строка " + lineNumber + ": " + line
+            );
         }
 
-        List<String> lines = new ArrayList<>();
+        try {
+            LocalDateTime orderTime = LocalDateTime.parse(parts[0].trim());
+            String customerName = parts[1].trim();
+            int quantity = Integer.parseInt(parts[2].trim());
 
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(inputStream))) {
+            return new Order(orderTime, quantity, customerName);
 
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
+        } catch (RuntimeException exception) {
+            throw new IllegalArgumentException(
+                    "Ошибка при обработке строки " + lineNumber + ": " + line,
+                    exception
+            );
         }
 
-        return lines;
     }
-
 }

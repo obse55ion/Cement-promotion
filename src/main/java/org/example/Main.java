@@ -1,16 +1,16 @@
 package org.example;
 
-import org.example.adapter.AbstractFileOrderAdapter;
 import org.example.adapter.HashFileOrderAdapter;
 import org.example.adapter.PipeFileOrderAdapter;
 import org.example.adapter.interfaces.OrderSource;
 import org.example.entity.Order;
 import org.example.repository.ResultWriter;
+import org.example.repository.interfaces.ResultOutput;
 import org.example.service.SaleService;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -19,21 +19,34 @@ public class Main {
         OrderSource txtReader = new PipeFileOrderAdapter();
         OrderSource hashReader = new HashFileOrderAdapter();
 
-        List<Order> txtOrders = txtReader.readOrders("discount_day.txt");
-        List<Order> hashOrders = hashReader.readOrders("discount_day_without_ext");
+        List<Order> txtOrders = txtReader.readOrders(
+                Path.of("src/main/resources/discount_day.txt")
+        );
+        List<Order> hashOrders = hashReader.readOrders(
+                Path.of("src/main/resources/discount_day_without_ext")
+        );
+        SaleService saleService = new SaleService(
+                BigDecimal.valueOf(10),
+                BigDecimal.valueOf(50),
+                BigDecimal.valueOf(5)
+        );
 
-        List<Order> allOrders = new ArrayList<>();
-        allOrders.addAll(txtOrders);
-        allOrders.addAll(hashOrders);
+        Map<String, BigDecimal> txtResults =
+                saleService.processOrder(txtOrders);
+        Map<String, BigDecimal> hashResults =
+                saleService.processOrder(hashOrders);
 
-        allOrders.sort(Comparator.comparing(Order::getOrderTime));
+        ResultOutput writer = new ResultWriter();
 
-        SaleService saleService = new SaleService(10, 20, 5);
+        writer.writeResults(
+                txtResults,
+                Path.of("result_txt.txt")
+        );
 
-        Map<String, Integer> results = saleService.processOrder(allOrders);
-
-        ResultWriter writer = new ResultWriter();
-        writer.writeResults(results, "result.txt");
+        writer.writeResults(
+                hashResults,
+                Path.of("result_hash.txt")
+        );
     }
 
 }

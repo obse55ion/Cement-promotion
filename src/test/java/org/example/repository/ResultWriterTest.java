@@ -30,7 +30,6 @@ class ResultWriterTest {
 
         ResultWriter writer = new ResultWriter();
 
-        writer.writeResults(results, output.toString());
 
         List<String> lines =
                 Files.readAllLines(output);

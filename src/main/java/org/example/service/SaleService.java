@@ -2,47 +2,45 @@ package org.example.service;
 
 import org.example.entity.Order;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SaleService {
 
-    private final int price;
-    private final int startDiscount;
-    private final int discountStep;
+    private final BigDecimal price;
+    private final BigDecimal startDiscount;
+    private final BigDecimal discountStep;
 
-    public SaleService(int price, int startDiscount, int discountStep) {
+    public SaleService(BigDecimal price, BigDecimal startDiscount, BigDecimal discountStep) {
         this.price = price;
         this.startDiscount = startDiscount;
         this.discountStep = discountStep;
     }
 
-    public Map<String, Integer> processOrder(List<Order> orders) {
-        Map<String, Integer> companyTotals = new HashMap<>();
+    public Map<String, BigDecimal> processOrder(List<Order> orders) {
+        Map<String, BigDecimal> companyTotals = new HashMap<>();
+        orders.sort(Comparator.comparing(Order::getOrderTime));
+        BigDecimal currentDiscount = startDiscount;
 
-        int currentDiscount = startDiscount;
         for (Order order : orders) {
-            int defaultPrice = order.getQuantity() * price;
-            int discountPrice = defaultPrice * (100 - currentDiscount) / 100;
+            BigDecimal defaultPrice = price.multiply(
+                    BigDecimal.valueOf(order.getQuantity())
+            );
+            BigDecimal discountPrice = defaultPrice
+                    .multiply(BigDecimal.valueOf(100).subtract(currentDiscount))
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
             String companyName = order.getCustomerName();
-            if (companyTotals.containsKey(companyName)) {
-                companyTotals.put(companyName, companyTotals.get(companyName) + discountPrice);
-            } else {
-                companyTotals.put(companyName, discountPrice);
-            }
-            if (currentDiscount >= discountStep) {
-                currentDiscount -= discountStep;
-            } else {
-                currentDiscount = 0;
-            }
-        }
-        for (Map.Entry<String, Integer> entry : companyTotals.entrySet()) {
-            String companyName = entry.getKey();
-            Integer totalPrice = entry.getValue();
-        }
 
+            companyTotals.merge(companyName, discountPrice, BigDecimal::add);
+
+            currentDiscount = currentDiscount.subtract(discountStep)
+                    .max(BigDecimal.ZERO);
+        }
         return companyTotals;
-
     }
 }
