@@ -8,6 +8,8 @@ import org.example.entity.Order;
 import org.example.service.SaleService;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -18,62 +20,51 @@ import static org.junit.jupiter.api.Assertions.*;
 class OrderProcessingTest {
 
     @Test
-    void processesBothResourceFilesCorrectly()
-            throws Exception {
-
-        // Создаём адаптеры
-        AbstractFileOrderAdapter txtAdapter =
+    void processesBothResourceFilesCorrectly() throws Exception {
+        PipeFileOrderAdapter txtAdapter =
                 new PipeFileOrderAdapter();
 
-        AbstractFileOrderAdapter hashAdapter =
+        HashFileOrderAdapter hashAdapter =
                 new HashFileOrderAdapter();
 
-        // Читаем заказы
-        List<Order> allOrders = new ArrayList<>();
+        List<Order> orders = new ArrayList<>();
 
-        allOrders.addAll(
-                txtAdapter.readOrders("discount_day.txt")
+        orders.addAll(
+                txtAdapter.readOrders(
+                        Path.of("src/main/resources/discount_day.txt")
+                )
         );
 
-        allOrders.addAll(
-                hashAdapter.readOrders("discount_day_without_ext")
+        orders.addAll(
+                hashAdapter.readOrders(
+                        Path.of("src/main/resources/discount_day_without_ext")
+                )
         );
 
-        // Проверяем количество заказов
-        assertEquals(26, allOrders.size());
+        assertEquals(26, orders.size());
 
-        // Сортируем общую очередь
-        allOrders.sort(
-                Comparator.comparing(Order::getOrderTime)
+        SaleService service = new SaleService(
+                new BigDecimal("10"),
+                new BigDecimal("20"),
+                new BigDecimal("5")
         );
 
-        // Первый заказ должен быть Recovery
-        assertEquals(
-                "Recovery",
-                allOrders.get(0).getCustomerName()
-        );
+        Map<String, BigDecimal> results =
+                service.processOrder(orders);
 
-        // Проверяем порядок времени
-        for (int i = 1; i < allOrders.size(); i++) {
-            assertFalse(
-                    allOrders.get(i).getOrderTime()
-                            .isBefore(
-                                    allOrders.get(i - 1).getOrderTime()
-                            )
-            );
-        }
-
-        // Рассчитываем стоимость
-        SaleService service =
-                new SaleService(10, 20, 5);
-
-        Map<String, Integer> results =
-                service.processOrder(allOrders);
-
-        // Проверяем итог
         assertEquals(12, results.size());
 
-        assertEquals(187110, results.get("Recovery"));
-        assertEquals(815380, results.get("Power Engineer"));
+        assertEquals(new BigDecimal("187110"), results.get("Recovery"));
+        assertEquals(new BigDecimal("815380"), results.get("Power Engineer"));
+        assertEquals(new BigDecimal("428200"), results.get("Preparatory"));
+        assertEquals(new BigDecimal("202000"), results.get("Pyramid"));
+        assertEquals(new BigDecimal("392000"), results.get("Fossil"));
+        assertEquals(new BigDecimal("662400"), results.get("Mosque"));
+        assertEquals(new BigDecimal("250000"), results.get("Atomic"));
+        assertEquals(new BigDecimal("73600"), results.get("Electricity"));
+        assertEquals(new BigDecimal("176000"), results.get("Industrial"));
+        assertEquals(new BigDecimal("593400"), results.get("Carryover"));
+        assertEquals(new BigDecimal("112200"), results.get("Resident"));
+        assertEquals(new BigDecimal("600000"), results.get("Ancillary"));
     }
 }

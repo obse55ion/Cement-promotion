@@ -4,6 +4,7 @@ package org.example.repository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -22,17 +23,16 @@ class ResultWriterTest {
 
         Path output = tempDir.resolve("result.txt");
 
-        Map<String, Integer> results =
-                new LinkedHashMap<>();
+        Map<String, BigDecimal> results = new LinkedHashMap<>();
 
-        results.put("Recovery", 187110);
-        results.put("Pyramid", 202000);
+        results.put("Recovery", new BigDecimal("187110"));
+        results.put("Pyramid", new BigDecimal("202000"));
 
         ResultWriter writer = new ResultWriter();
 
+        writer.writeResults(results, output);
 
-        List<String> lines =
-                Files.readAllLines(output);
+        List<String> lines = Files.readAllLines(output);
 
         assertEquals(2, lines.size());
 
@@ -48,7 +48,7 @@ class ResultWriterTest {
 
         ResultWriter writer = new ResultWriter();
 
-        writer.writeResults(Map.of(), output.toString());
+        writer.writeResults(Map.of(), Path.of(output.toString()));
 
         assertTrue(Files.exists(output));
 

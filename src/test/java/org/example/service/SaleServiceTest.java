@@ -1,12 +1,14 @@
 
 package org.example.service;
 
-import org.example.adapter.AbstractFileOrderAdapter;
 import org.example.adapter.HashFileOrderAdapter;
 import org.example.adapter.PipeFileOrderAdapter;
 import org.example.entity.Order;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -26,50 +28,58 @@ class SaleServiceTest {
         HashFileOrderAdapter hashAdapter =
                 new HashFileOrderAdapter();
 
+        Path txtPath = Path.of(
+                getClass().getResource("/discount_day.txt").toURI()
+        );
+
+        Path hashPath = Path.of(
+                getClass().getResource("/discount_day_without_ext").toURI()
+        );
+
         List<Order> orders = new ArrayList<>();
 
-        orders.addAll(
-                txtAdapter.readOrders("discount_day.txt")
+        orders.addAll(txtAdapter.readOrders(txtPath));
+        orders.addAll(hashAdapter.readOrders(hashPath));
+
+        orders = orders.stream()
+                .sorted(Comparator.comparing(Order::getOrderTime))
+                .toList();
+
+        SaleService service = new SaleService(
+                new BigDecimal("10"),
+                new BigDecimal("0.20"),
+                new BigDecimal("0.05")
         );
 
-        orders.addAll(
-                hashAdapter.readOrders("discount_day_without_ext")
-        );
-
-        orders.sort(
-                Comparator.comparing(Order::getOrderTime)
-        );
-
-        SaleService service =
-                new SaleService(10, 20, 5);
-
-        Map<String, Integer> result =
-                service.processOrder(orders);
+        Map<String, BigDecimal> result =
+                service.processOrder(new ArrayList<>(orders));
 
         assertEquals(12, result.size());
 
-        assertEquals(187110, result.get("Recovery"));
-        assertEquals(815380, result.get("Power Engineer"));
-        assertEquals(428200, result.get("Preparatory"));
-        assertEquals(202000, result.get("Pyramid"));
-        assertEquals(392000, result.get("Fossil"));
-        assertEquals(662400, result.get("Mosque"));
-        assertEquals(250000, result.get("Atomic"));
-        assertEquals(73600, result.get("Electricity"));
-        assertEquals(176000, result.get("Industrial"));
-        assertEquals(593400, result.get("Carryover"));
-        assertEquals(112200, result.get("Resident"));
-        assertEquals(600000, result.get("Ancillary"));
+        assertEquals(new BigDecimal("187110.00"), result.get("Recovery"));
+        assertEquals(new BigDecimal("815380.00"), result.get("Power Engineer"));
+        assertEquals(new BigDecimal("428200.00"), result.get("Preparatory"));
+        assertEquals(new BigDecimal("202000.00"), result.get("Pyramid"));
+        assertEquals(new BigDecimal("392000.00"), result.get("Fossil"));
+        assertEquals(new BigDecimal("662400.00"), result.get("Mosque"));
+        assertEquals(new BigDecimal("250000.00"), result.get("Atomic"));
+        assertEquals(new BigDecimal("73600.00"), result.get("Electricity"));
+        assertEquals(new BigDecimal("176000.00"), result.get("Industrial"));
+        assertEquals(new BigDecimal("593400.00"), result.get("Carryover"));
+        assertEquals(new BigDecimal("112200.00"), result.get("Resident"));
+        assertEquals(new BigDecimal("600000.00"), result.get("Ancillary"));
     }
 
     @Test
     void returnsEmptyMapWhenThereAreNoOrders() {
 
-        SaleService service =
-                new SaleService(10, 20, 5);
-
-        Map<String, Integer> result =
-                service.processOrder(List.of());
+        SaleService service = new SaleService(
+                new BigDecimal("10"),
+                new BigDecimal("0.20"),
+                new BigDecimal("0.05")
+        );
+        Map<String, BigDecimal> result =
+                service.processOrder(new ArrayList<>());;
 
         assertTrue(result.isEmpty());
     }
@@ -77,38 +87,34 @@ class SaleServiceTest {
     @Test
     void appliesZeroDiscountAfterDiscountRunsOut() {
 
-        SaleService service =
-                new SaleService(10, 10, 5);
+        SaleService service = new SaleService(
+                new BigDecimal("100"),
+                new BigDecimal("0.10"),
+                new BigDecimal("0.10")
+        );
 
-        List<Order> orders = List.of(
+        List<Order> orders = new ArrayList<>(List.of(
                 new Order(
-                        java.time.LocalDateTime.parse(
-                                "2021-02-09T08:00:00"
-                        ),
+                        LocalDateTime.parse("2021-02-09T08:00:00"),
                         100,
                         "Company A"
                 ),
                 new Order(
-                        java.time.LocalDateTime.parse(
-                                "2021-02-09T09:00:00"
-                        ),
+                        LocalDateTime.parse("2021-02-09T09:00:00"),
                         100,
                         "Company B"
                 ),
                 new Order(
-                        java.time.LocalDateTime.parse(
-                                "2021-02-09T10:00:00"
-                        ),
+                        LocalDateTime.parse("2021-02-09T10:00:00"),
                         100,
                         "Company C"
                 )
-        );
+        ));
 
-        Map<String, Integer> result =
-                service.processOrder(orders);
+        Map<String, BigDecimal> result = service.processOrder(orders);
 
-        assertEquals(900, result.get("Company A"));
-        assertEquals(950, result.get("Company B"));
-        assertEquals(1000, result.get("Company C"));
+        assertEquals(new BigDecimal("9000.00"), result.get("Company A"));
+        assertEquals(new BigDecimal("10000.00"), result.get("Company B"));
+        assertEquals(new BigDecimal("10000.00"), result.get("Company C"));
     }
 }

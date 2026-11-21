@@ -34,3 +34,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Result files
+result_hash.txt
+result_txt.txt

@@ -48,8 +48,8 @@ public class SaleService {
                     BigDecimal.valueOf(order.getQuantity())
             );
             BigDecimal discountPrice = defaultPrice
-                    .multiply(BigDecimal.valueOf(100).subtract(currentDiscount))
-                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                    .multiply(BigDecimal.ONE.subtract(currentDiscount))
+                    .setScale(2, RoundingMode.HALF_UP);
 
             String companyName = order.getCustomerName();
 
