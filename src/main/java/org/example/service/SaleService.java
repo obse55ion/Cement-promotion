@@ -38,7 +38,7 @@ public class SaleService {
         sortedOrders.sort(Comparator.comparing(Order::getOrderTime));
         int currentDiscount = startDiscount;
 
-        for (Order order : orders) {
+        for (Order order : sortedOrders) {
             BigDecimal defaultPrice = price.multiply(
                     BigDecimal.valueOf(order.getQuantity())
             );

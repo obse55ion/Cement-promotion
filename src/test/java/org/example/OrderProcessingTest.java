@@ -45,8 +45,8 @@ class OrderProcessingTest {
 
         SaleService service = new SaleService(
                 new BigDecimal("10"),
-                new BigDecimal("20"),
-                new BigDecimal("5")
+                20,
+                5
         );
 
         Map<String, BigDecimal> results =
@@ -54,17 +54,17 @@ class OrderProcessingTest {
 
         assertEquals(12, results.size());
 
-        assertEquals(new BigDecimal("187110"), results.get("Recovery"));
-        assertEquals(new BigDecimal("815380"), results.get("Power Engineer"));
-        assertEquals(new BigDecimal("428200"), results.get("Preparatory"));
-        assertEquals(new BigDecimal("202000"), results.get("Pyramid"));
-        assertEquals(new BigDecimal("392000"), results.get("Fossil"));
-        assertEquals(new BigDecimal("662400"), results.get("Mosque"));
-        assertEquals(new BigDecimal("250000"), results.get("Atomic"));
-        assertEquals(new BigDecimal("73600"), results.get("Electricity"));
-        assertEquals(new BigDecimal("176000"), results.get("Industrial"));
-        assertEquals(new BigDecimal("593400"), results.get("Carryover"));
-        assertEquals(new BigDecimal("112200"), results.get("Resident"));
-        assertEquals(new BigDecimal("600000"), results.get("Ancillary"));
+        assertEquals(new BigDecimal("187110.00"), results.get("Recovery"));
+        assertEquals(new BigDecimal("815380.00"), results.get("Power Engineer"));
+        assertEquals(new BigDecimal("428200.00"), results.get("Preparatory"));
+        assertEquals(new BigDecimal("202000.00"), results.get("Pyramid"));
+        assertEquals(new BigDecimal("392000.00"), results.get("Fossil"));
+        assertEquals(new BigDecimal("662400.00"), results.get("Mosque"));
+        assertEquals(new BigDecimal("250000.00"), results.get("Atomic"));
+        assertEquals(new BigDecimal("73600.00"), results.get("Electricity"));
+        assertEquals(new BigDecimal("176000.00"), results.get("Industrial"));
+        assertEquals(new BigDecimal("593400.00"), results.get("Carryover"));
+        assertEquals(new BigDecimal("112200.00"), results.get("Resident"));
+        assertEquals(new BigDecimal("600000.00"), results.get("Ancillary"));
     }
 }

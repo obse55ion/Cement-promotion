@@ -47,8 +47,8 @@ class SaleServiceTest {
 
         SaleService service = new SaleService(
                 new BigDecimal("10"),
-                new BigDecimal("0.20"),
-                new BigDecimal("0.05")
+                20,
+                5
         );
 
         Map<String, BigDecimal> result =
@@ -75,8 +75,8 @@ class SaleServiceTest {
 
         SaleService service = new SaleService(
                 new BigDecimal("10"),
-                new BigDecimal("0.20"),
-                new BigDecimal("0.05")
+                20,
+                5
         );
         Map<String, BigDecimal> result =
                 service.processOrder(new ArrayList<>());;
@@ -89,8 +89,8 @@ class SaleServiceTest {
 
         SaleService service = new SaleService(
                 new BigDecimal("100"),
-                new BigDecimal("0.10"),
-                new BigDecimal("0.10")
+                20,
+                5
         );
 
         List<Order> orders = new ArrayList<>(List.of(
@@ -112,6 +112,8 @@ class SaleServiceTest {
         ));
 
         Map<String, BigDecimal> result = service.processOrder(orders);
+
+
 
         assertEquals(new BigDecimal("9000.00"), result.get("Company A"));
         assertEquals(new BigDecimal("10000.00"), result.get("Company B"));
