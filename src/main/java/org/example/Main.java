@@ -27,8 +27,8 @@ public class Main {
         );
         SaleService saleService = new SaleService(
                 BigDecimal.valueOf(10),
-                BigDecimal.valueOf(50),
-                BigDecimal.valueOf(5)
+                20,
+                5
         );
 
         Map<String, BigDecimal> txtResults =

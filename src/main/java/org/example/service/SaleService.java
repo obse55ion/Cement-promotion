@@ -4,33 +4,26 @@ import org.example.entity.Order;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SaleService {
 
     private final BigDecimal price;
-    private final BigDecimal startDiscount;
-    private final BigDecimal discountStep;
+    private final int startDiscount;
+    private final int discountStep;
 
-    public SaleService(BigDecimal price, BigDecimal startDiscount, BigDecimal discountStep) {
+    public SaleService(BigDecimal price, int startDiscount, int discountStep) {
         if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Значение цена не может быть ноль или отрицательным");
         }
-        if (startDiscount == null
-                || startDiscount.compareTo(BigDecimal.ZERO) < 0
-                || startDiscount.compareTo(BigDecimal.ONE) > 0) {
-            throw new IllegalArgumentException();
+        if (startDiscount < 0 || startDiscount > 100) {
+            throw new IllegalArgumentException("Скидка не может быть больше 100 или отрицательной");
         }
-        if (discountStep == null
-                || discountStep.compareTo(BigDecimal.ZERO) <= 0
-                || discountStep.compareTo(BigDecimal.ONE) > 0) {
-            throw new IllegalArgumentException();
+        if (discountStep <= 0 || discountStep > 100) {
+            throw new IllegalArgumentException("Шаг уменьшения скидки от 1 до 100");
         }
-        if (startDiscount.add(discountStep).compareTo(BigDecimal.ONE) > 0) {
-            throw new IllegalArgumentException();
+        if (startDiscount + discountStep > 100) {
+            throw new IllegalArgumentException("Сумма начальной скидки и шага не должна превышать 100%");
         }
 
         this.price = price;
@@ -40,23 +33,25 @@ public class SaleService {
 
     public Map<String, BigDecimal> processOrder(List<Order> orders) {
         Map<String, BigDecimal> companyTotals = new HashMap<>();
-        orders.sort(Comparator.comparing(Order::getOrderTime));
-        BigDecimal currentDiscount = startDiscount;
+
+        List<Order> sortedOrders = new ArrayList<>(orders);
+        sortedOrders.sort(Comparator.comparing(Order::getOrderTime));
+        int currentDiscount = startDiscount;
 
         for (Order order : orders) {
             BigDecimal defaultPrice = price.multiply(
                     BigDecimal.valueOf(order.getQuantity())
             );
+
             BigDecimal discountPrice = defaultPrice
-                    .multiply(BigDecimal.ONE.subtract(currentDiscount))
-                    .setScale(2, RoundingMode.HALF_UP);
+                    .multiply(BigDecimal.valueOf(100 - currentDiscount))
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
 
             String companyName = order.getCustomerName();
 
             companyTotals.merge(companyName, discountPrice, BigDecimal::add);
 
-            currentDiscount = currentDiscount.subtract(discountStep)
-                    .max(BigDecimal.ZERO);
+            currentDiscount = Math.max(0, currentDiscount - discountStep);
         }
         return companyTotals;
     }

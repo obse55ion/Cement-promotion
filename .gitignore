@@ -36,5 +36,4 @@ build/
 .DS_Store
 
 # Result files
-result_hash.txt
-result_txt.txt
+*.txt
